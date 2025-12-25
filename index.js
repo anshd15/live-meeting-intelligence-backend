@@ -4,6 +4,7 @@ const { Server } = require("socket.io");
 
 const app = express();
 const server = http.createServer(app);
+const PORT = process.env.PORT || 5000;
 
 const io = new Server(server, {
   cors: {
@@ -44,6 +45,6 @@ io.on("connection", socket => {
   });
 });
 
-server.listen(5000, () =>
-  console.log("Signaling server on port 5000")
-);
+server.listen(PORT, () => {
+  console.log(`Signaling server running on port ${PORT}`);
+});
