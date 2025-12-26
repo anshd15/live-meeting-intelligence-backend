@@ -8,8 +8,8 @@ const PORT = process.env.PORT || 5000;
 
 const io = new Server(server, {
   cors: {
-    origin: "*"
-  }
+    origin: "*",
+  },
 });
 
 io.on("connection", socket => {
@@ -18,26 +18,34 @@ io.on("connection", socket => {
   socket.on("join-room", roomId => {
     socket.join(roomId);
 
-    const clients = io.sockets.adapter.rooms.get(roomId);
-    const numClients = clients ? clients.size : 0;
+    const room = io.sockets.adapter.rooms.get(roomId);
+    const numClients = room ? room.size : 0;
 
-    // notify existing users
-    socket.to(roomId).emit("user-joined", socket.id);
+    console.log(`Room ${roomId} has ${numClients} users`);
 
-    // tell new user how many are already there
-    socket.emit("room-info", numClients);
+    // ❌ prevent more than 2 users
+    if (numClients > 2) {
+      socket.emit("room-full");
+      socket.leave(roomId);
+      return;
+    }
+
+    // ✅ when 2 users are present, signal both to start WebRTC
+    if (numClients === 2) {
+      io.to(roomId).emit("ready");
+    }
   });
 
-  socket.on("offer", (offer, roomId) => {
-    socket.to(roomId).emit("offer", offer);
+  socket.on("offer", ({ offer, roomId }) => {
+    socket.to(roomId).emit("offer", { offer });
   });
 
-  socket.on("answer", (answer, roomId) => {
-    socket.to(roomId).emit("answer", answer);
+  socket.on("answer", ({ answer, roomId }) => {
+    socket.to(roomId).emit("answer", { answer });
   });
 
-  socket.on("ice-candidate", (candidate, roomId) => {
-    socket.to(roomId).emit("ice-candidate", candidate);
+  socket.on("ice-candidate", ({ candidate, roomId }) => {
+    socket.to(roomId).emit("ice-candidate", { candidate });
   });
 
   socket.on("disconnect", () => {
