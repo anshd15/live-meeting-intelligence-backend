@@ -19,20 +19,17 @@ io.on("connection", socket => {
     socket.join(roomId);
 
     const room = io.sockets.adapter.rooms.get(roomId);
-    const numClients = room ? room.size : 0;
+    const count = room ? room.size : 0;
 
-    console.log(`Room ${roomId} has ${numClients} users`);
+    console.log(`Room ${roomId} users: ${count}`);
 
-    // ❌ prevent more than 2 users
-    if (numClients > 2) {
-      socket.emit("room-full");
-      socket.leave(roomId);
-      return;
+    if (count === 2) {
+      io.to(roomId).emit("ready");
     }
 
-    // ✅ when 2 users are present, signal both to start WebRTC
-    if (numClients === 2) {
-      io.to(roomId).emit("ready");
+    if (count > 2) {
+      socket.emit("room-full");
+      socket.leave(roomId);
     }
   });
 
