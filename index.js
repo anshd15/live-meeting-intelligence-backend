@@ -34,8 +34,12 @@ app.get("/api/ice", (req, res) => {
 /* -------------------- SOCKET.IO -------------------- */
 const io = new Server(server, {
   cors: {
-    origin: "*",
+    origin: [
+      "http://localhost:5173",
+      "https://live-meeting-intelligence.netlify.app",
+    ],
     methods: ["GET", "POST"],
+    credentials: true,
   },
 });
 
