@@ -1,4 +1,5 @@
 require("dotenv").config();
+const authRoutes = require("./routes/auth");
 // import cors from "cors";
 const express = require("express");
 const http = require("http");
@@ -12,6 +13,8 @@ const PORT = process.env.PORT || 5000;
 /* -------------------- MIDDLEWARE -------------------- */
 app.use(cors());
 app.use(express.json());
+app.use("/api/auth", authRoutes);
+
 
 /* -------------------- ICE CONFIG API -------------------- */
 /**
