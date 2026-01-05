@@ -1,6 +1,6 @@
 export default function roomHandlers(io) {
   io.on("connection", (socket) => {
-    console.log("Connected:", socket.id);
+    console.log("✅ Connected:", socket.id);
 
     socket.on("join-room", (roomId) => {
       socket.join(roomId);
@@ -9,13 +9,19 @@ export default function roomHandlers(io) {
         io.sockets.adapter.rooms.get(roomId) || []
       );
 
-      console.log("Room:", roomId, "Clients:", clients);
+      console.log("📦 Room:", roomId, "Clients:", clients);
 
-      // When second user joins, start WebRTC
+      // Allow only 2 users
       if (clients.length === 2) {
         io.to(roomId).emit("ready", {
-          callerId: clients[0],
+          callerId: clients[0], // first joiner is caller
         });
+        console.log("☎️ Caller:", clients[0]);
+      }
+
+      if (clients.length > 2) {
+        socket.emit("room-full");
+        socket.leave(roomId);
       }
     });
 
@@ -32,7 +38,7 @@ export default function roomHandlers(io) {
     });
 
     socket.on("disconnect", () => {
-      console.log("Disconnected:", socket.id);
+      console.log("❌ Disconnected:", socket.id);
     });
   });
 }
