@@ -21,9 +21,16 @@ app.use(express.json());
 app.get("/api/ice", (req, res) => {
   res.json({
     iceServers: [
-      { urls: "stun:stun.l.google.com:19302" },
       {
-        urls: process.env.TURN_URL,
+        urls: [
+          "stun:stun.l.google.com:19302"
+        ],
+      },
+      {
+        urls: [
+          `turn:${process.env.TURN_IP}:3478?transport=udp`,
+          `turn:${process.env.TURN_IP}:3478?transport=tcp`
+        ],
         username: process.env.TURN_USERNAME,
         credential: process.env.TURN_PASSWORD,
       },
