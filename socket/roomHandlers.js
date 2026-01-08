@@ -63,8 +63,7 @@ export default function roomHandlers(io) {
 
       // When 2 participants are present → start WebRTC
       if (room.participants.size === 2) {
-        const [callerId] = Array.from(room.participants);
-        io.to(roomId).emit("ready", { callerId });
+        io.to(roomId).emit("ready", { callerId: room.host });
 
         console.log("☎️ Call ready in room", roomId);
       }
